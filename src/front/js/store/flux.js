@@ -1,6 +1,7 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
+			products: [],
 			message: null,
 			demo: [
 				{
@@ -46,6 +47,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			getProducts: () => {
+				fetch(process.env.BACKEND_URL + "/api/products")
+				.then((response) => response.json())
+          		.then((data) => {
+					setStore({ products: data.results })})
+          		.catch((err) => console.error("msg: "+ err));
+			},
+			createProducts : (price, name) => {
+				fetch(process.env.BACKEND_URL + "/api/newProduct", {
+					method: "POST",
+					headers: { "Content-type": "application/json" },
+					body: JSON.stringify({
+						price: price,
+						name: name
+					}) 
+				})
+				.then((response) => response.json())
+				.then(() => getActions().getProducts())
+				.catch((err) => console.error(err));
+				
 			}
 		}
 	};
